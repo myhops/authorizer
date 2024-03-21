@@ -1,0 +1,21 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - task: image
+
+  build:
+    desc: Build main
+    cmds:
+      - cmd: go build -o main github.com/myhops/authorizer/cmd/authorizer
+
+  image:
+    desc: Build image
+    cmds:
+      - podman build --tag authorizer --file docker/Dockerfile .
