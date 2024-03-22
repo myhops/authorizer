@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"reflect"
 	"testing"
 )
@@ -19,7 +20,7 @@ func Test_getOptions(t *testing.T) {
 		{
 			name: "ok",
 			args: args{
-				[]string{"app", "-key=header1,key1", "-key=header2,key2"},
+				[]string{"app", "-key=header1=key1", "-key=header2=key2"},
 			},
 			want: &options{
 				ListenAddress: ":8080",
@@ -33,6 +34,34 @@ func Test_getOptions(t *testing.T) {
 						Key: "key2",
 					},
 				},
+				AllowedCode: 200,
+				ForbiddenCode: 403,
+				LogFile: "/dev/stdout",
+				LogFormat: "text",
+			},
+		},
+		{
+			name: "level",
+			args: args{
+				[]string{"app", "-key=header1=key1", "-key=header2=key2", "-loglevel=warn"},
+			},
+			want: &options{
+				ListenAddress: ":8080",
+				Keys: keysOption{
+					keyOption{
+						Header: "header1",
+						Key: "key1",
+					},
+					keyOption{
+						Header: "header2",
+						Key: "key2",
+					},
+				},
+				AllowedCode: 200,
+				ForbiddenCode: 403,
+				LogLevel: logLevelOption(slog.LevelWarn),
+				LogFile: "/dev/stdout",
+				LogFormat: "text",
 			},
 		},
 	}

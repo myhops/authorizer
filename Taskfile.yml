@@ -10,6 +10,11 @@ tasks:
     cmds:
       - task: image
 
+  test:
+    desc: go test
+    cmds:
+      - cmd: go test ./...
+
   build:
     desc: Build main
     cmds:

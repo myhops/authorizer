@@ -2,6 +2,7 @@ package authorizer
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 )
 
@@ -31,6 +32,8 @@ func (k *Key) InHeader(header http.Header) bool {
 type Authorizer struct {
 	Keys                    []*Key
 	NotAuthorizedStatusCode int
+	AuthorizedStatusCode    int
+	Logger                  *slog.Logger
 }
 
 func (a *Authorizer) Authorized(h http.Header) bool {
@@ -43,16 +46,16 @@ func (a *Authorizer) Authorized(h http.Header) bool {
 }
 
 func (a *Authorizer) Handle() http.HandlerFunc {
-	if a.NotAuthorizedStatusCode == 0 {
-		a.NotAuthorizedStatusCode = http.StatusForbidden
-	}
+	logger := a.Logger.With(slog.String("function", "handler"))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("handler called", slog.String("path", r.URL.RawPath), slog.String("host", r.Host))
 		if !a.Authorized(r.Header) {
+			logger.Info("forbidden")
 			w.WriteHeader(a.NotAuthorizedStatusCode)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(nil)
+		logger.Info("authorized")
+		w.WriteHeader(a.AuthorizedStatusCode)
 	})
 }
 
@@ -66,7 +69,7 @@ func New(headerKeys [][]string) (*Authorizer, error) {
 			return nil, fmt.Errorf("expected 2 elements")
 		}
 		h := http.CanonicalHeaderKey(hk[0])
-		keys[h] = append(keys[h],  hk[1])
+		keys[h] = append(keys[h], hk[1])
 	}
 	for k, v := range keys {
 		a.Keys = append(a.Keys, &Key{Header: k, Values: v})
