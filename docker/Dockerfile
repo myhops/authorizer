@@ -1,5 +1,5 @@
 # Get the latest go image
-FROM docker.io/golang:latest AS builder
+FROM docker.io/golang:1.22.1-alpine AS builder
 WORKDIR /work 
 # COPY go.mod go.sum ./
 COPY go.mod ./
