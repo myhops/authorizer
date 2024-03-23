@@ -85,6 +85,14 @@ func (o *keysOption) String() string {
 	return fmt.Sprint(*o)
 }
 
+func (k *keysOption) Keys() [][]string {
+	var res [][]string
+	for _, kk := range *k {
+		res = append(res, []string{kk.Header, kk.Key})
+	}
+	return res
+}
+
 func getOptions(args []string) (*options, error) {
 	opts := &options{
 		ListenAddress: ":8080",
@@ -118,7 +126,11 @@ func getHeaderKeys(keys keysOption) [][]string {
 }
 
 func run(opts *options) error {
-	a, err := authorizer.New(getHeaderKeys(opts.Keys))
+	ks, err := authorizer.AggrateKeys(opts.Keys.Keys())
+	if err != nil {
+		return fmt.Errorf("error aggregating keys: %w", err)
+	}
+	a, err := authorizer.New(ks)
 	if err != nil {
 		return fmt.Errorf("error creating an authorizer: %w", err)
 	}

@@ -14,5 +14,4 @@ COPY --from=builder /work/main /main
 # COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 EXPOSE 8080
 ENV port=8080
-ENV NAME=myipaddress_1
 ENTRYPOINT ["/main"]

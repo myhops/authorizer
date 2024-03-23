@@ -1,6 +1,7 @@
 package authorizer
 
 import (
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -83,6 +84,9 @@ func TestHandler(t *testing.T) {
 		Keys: []*Key{
 			newKey("x-api-key", []string{"valid-key"}),
 		},
+		Logger: slog.Default(),
+		NotAuthorizedStatusCode: http.StatusForbidden,
+		AuthorizedStatusCode: http.StatusOK,
 	}
 
 	srv := httptest.NewServer(a.Handle())

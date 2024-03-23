@@ -24,3 +24,10 @@ tasks:
     desc: Build image
     cmds:
       - podman build --tag authorizer --file docker/Dockerfile .
+
+  push:
+    desc: Push image
+    deps:
+      - image
+    cmds:
+      - cmd: crane copy localhost/authorizer docker.io/peterzandbergen/authorizer:latest
