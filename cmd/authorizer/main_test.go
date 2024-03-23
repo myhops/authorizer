@@ -41,6 +41,29 @@ func Test_getOptions(t *testing.T) {
 			},
 		},
 		{
+			name: "multi",
+			args: args{
+				[]string{"app", "-key=header1=key1,header2=key2"},
+			},
+			want: &options{
+				ListenAddress: ":8080",
+				Keys: keysOption{
+					keyOption{
+						Header: "header1",
+						Key: "key1",
+					},
+					keyOption{
+						Header: "header2",
+						Key: "key2",
+					},
+				},
+				AllowedCode: 200,
+				ForbiddenCode: 403,
+				LogFile: "/dev/stdout",
+				LogFormat: "text",
+			},
+		},
+		{
 			name: "level",
 			args: args{
 				[]string{"app", "-key=header1=key1", "-key=header2=key2", "-loglevel=warn"},

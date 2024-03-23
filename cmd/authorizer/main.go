@@ -70,14 +70,19 @@ func (l *logLevelOption) String() string {
 
 type keysOption []keyOption
 
+// keys options can be set as key=value, but also as key1=value1,key2=value2
 func (o *keysOption) Set(value string) error {
-	// Split the value in key and header.
-	s := strings.Split(value, "=")
-	if len(s) != 2 {
-		return fmt.Errorf("key needs to have a key and a value separated by a comma")
+	// split on the comma
+	kvs := strings.Split(value, ",")
+	for _, kv := range kvs {
+		// Split the value in key and header.
+		s := strings.Split(kv, "=")
+		if len(s) != 2 {
+			return fmt.Errorf("key needs to have a key and a value separated by a comma")
+		}
+		// Append the key
+		*o = append(*o, keyOption{Header: s[0], Key: s[1]})
 	}
-	// Append the key
-	*o = append(*o, keyOption{Header: s[0], Key: s[1]})
 	return nil
 }
 
@@ -149,8 +154,10 @@ func run(opts *options) error {
 		},
 	}
 	// Start the server.
-	a.Logger.Info("starting the server", slog.String("listen_address",opts.ListenAddress ))
+	a.Logger.Info("starting the server", slog.String("listen_address", opts.ListenAddress))
 	go svr.ListenAndServe()
+
+	a.Logger.Info("server started")
 
 	<-ctx.Done()
 	a.Logger.Info("context.Done")
@@ -176,6 +183,7 @@ func main() {
 
 	// build the logger
 	l := slog.New(h).With(slog.String("application", os.Args[0]))
+	l.Info("init succeeded")
 	slog.SetDefault(l)
 	if err := run(options); err != nil {
 		l.Error("run failed", slog.String("err", err.Error()))

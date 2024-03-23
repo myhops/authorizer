@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: authorizer
+  name: authorizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authorizer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: authorizer
+    spec:
+      containers:
+      - image: docker.io/peterzandbergen/authorizer:v0.0.2
+        imagePullPolicy: IfNotPresent
+        name: authorizer
+        args:
+          - -key=$(AUTH_keys)
+          - -logformat=json
+        envFrom:
+          - configMapRef:
+              name: auth-keys
+            prefix: AUTH_
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP  
+        resources: 
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi

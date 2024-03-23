@@ -57,15 +57,16 @@ func (d durationLV) LogValue() slog.Value {
 	return slog.StringValue(d.String())
 }
 
-
 func (a *Authorizer) Handle() http.HandlerFunc {
 	logger := a.Logger.With(slog.String("function", "handler"))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger = logger.With(
+			slog.String("path", r.URL.RawPath),
+			slog.String("host", r.Host))
+
 		defer func(start time.Time) {
 			since := time.Since(start)
 			logger.Info("handler called",
-				slog.String("path", r.URL.RawPath),
-				slog.String("host", r.Host),
 				slog.Time("start", start),
 				slog.Duration("duration", since),
 				slog.Attr{Key: "duration_string", Value: durationLV(since).LogValue()},

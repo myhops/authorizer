@@ -30,4 +30,7 @@ tasks:
     deps:
       - image
     cmds:
-      - cmd: crane copy localhost/authorizer docker.io/peterzandbergen/authorizer:latest
+      # - cmd: rm /tmp/authorizer.image.tar
+      - cmd: podman save localhost/authorizer:latest > /tmp/authorizer.image.tar
+      - cmd: crane push /tmp/authorizer.image.tar docker.io/peterzandbergen/authorizer:v0.0.2
+      
