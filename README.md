@@ -14,7 +14,44 @@ For this I created the **authorizer**.
 
 Authorizer is a very simple web server that checks api keys contained in http headers.
 
-## Configuration steps
+## Configuration and installation steps
+
+We need to install the authorizer and configure Istio and add an envoyExtAuthzHttp to the extensionProviders.
+Secondly we need to install the authorizer service with the set of valid API keys.
+And lastly we create an AuthorizationPolicy with a custom action that uses the external authorizer.
+
+### Istio Operator Configuration
+
+Below you see the manifest for the Istio operator and the part that adds the extension.
+
+```yaml
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: example-istiocontrolplane
+  namespace: istio-system
+spec:
+  meshConfig:
+    extensionProviders:     # 1
+      - envoyExtAuthzHttp:  # 2
+          name: api-key-authenticator   # 3
+          includeRequestHeadersInCheck: # 4
+            - X-Vbi-Api-Key
+          # pathPrefix: / # Add a prefix if necessary
+          port: 8080
+          # The DNS name of the service.
+          service: default/api-key-authenticator.default.svc.cluster.local
+  profile: demo
+```
+
+1. The mesh config allows you to add multiple extensions.
+1. We add the http type authorizer.
+1. The name of the extension. We need this in the AP.
+1. The header(s) that contain the api key.
+
+### The AuthorizationPolicy
+
+
 
 To use an external authorization provider, you need to configure the Istio control plane. 
 This configuration example shows the parts that you need to add to the Istio Operator manifest.
@@ -101,31 +138,14 @@ Or in a Pod
 
 ```
 
-```yaml
-apiVersion: install.istio.io/v1alpha1
-kind: IstioOperator
-metadata:
-  name: example-istiocontrolplane
-  namespace: istio-system
-spec:
-  meshConfig:
-    extensionProviders:
-    - envoyExtAuthzHttp:
-        includeRequestHeadersInCheck:
-        - X-Vbi-Api-Key
-        pathPrefix: /anything
-        port: 8080
-        service: default/api-key-authenticator.default.svc.cluster.local
-      name: api-key-authenticator
-  profile: demo
-```
+
 
 ## Istio Configuration
 
-TODO: MeshConfiguration
-TODO: Maistra operator configuration
-TODO: Istio operator configuration
-TODO: authorizer command
+- TODO: MeshConfiguration
+- TODO: Maistra operator configuration
+- TODO: Istio operator configuration
+- TODO: authorizer command
 
 
 
