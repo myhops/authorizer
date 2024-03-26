@@ -16,7 +16,7 @@ spec:
         app: authorizer
     spec:
       containers:
-      - image: docker.io/peterzandbergen/authorizer:v0.0.2
+      - image: docker.io/peterzandbergen/authorizer:v0.0.3
         imagePullPolicy: IfNotPresent
         name: authorizer
         args:

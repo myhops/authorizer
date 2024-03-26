@@ -108,7 +108,7 @@ func getOptions(args []string) (*options, error) {
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	args = args[1:]
 
-	fs.Var(&opts.Keys, "key", "valid headers, <header,value>. Can be used multiple times.")
+	fs.Var(&opts.Keys, "key", "valid headers, <header=value>. Can be used multiple times.")
 	fs.StringVar(&opts.ListenAddress, "address", ":8080", "Listen address, defaults to :8080")
 	fs.Var(&opts.LogLevel, "loglevel", "loglevel: [debug, info, warn, error]")
 	fs.Var(&opts.LogFormat, "logformat", "logformat: [json, text]")
