@@ -122,20 +122,12 @@ func getOptions(args []string) (*options, error) {
 	return opts, nil
 }
 
-func getHeaderKeys(keys keysOption) [][]string {
-	var res [][]string
-	for _, kk := range keys {
-		res = append(res, []string{kk.Header, kk.Key})
-	}
-	return res
-}
-
 func run(opts *options) error {
-	ks, err := authorizer.AggrateKeys(opts.Keys.Keys())
+	ra, err := authorizer.NewFromKeyList(opts.Keys.Keys())
 	if err != nil {
 		return fmt.Errorf("error aggregating keys: %w", err)
 	}
-	a, err := authorizer.New(ks)
+	a, err := authorizer.New()
 	if err != nil {
 		return fmt.Errorf("error creating an authorizer: %w", err)
 	}
@@ -147,7 +139,7 @@ func run(opts *options) error {
 	defer cancel()
 
 	svr := http.Server{
-		Handler: a.Handle(),
+		Handler: a.Handle(ra),
 		Addr:    opts.ListenAddress,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
